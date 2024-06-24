@@ -13,6 +13,39 @@ if game.PlaceId == 3237168 then
         Icon = "https://cdn.discordapp.com/attachments/1046940183733473372/1254799137681965189/e04b135ee5ded5ce13c76cf98ea7db9e.png?ex=667ace43&is=66797cc3&hm=fcb4ee9677dcb11b40f946922c56e8f9df39edebc1037de34ffff968adb5f74c&"
     })
 
+    -- Cria a janela do console
+    local ConsoleWindow = OrionLib:MakeWindow({
+        Name = "Console",
+        HidePremium = false,
+        SaveConfig = true,
+        ConfigFolder = "ConsoleOutput",
+        IntroEnabled = false,
+        Icon = "rbxassetid://4483345998"
+    })
+
+    -- Adiciona uma área de texto para exibir a saída
+    local ConsoleTab = ConsoleWindow:MakeTab({
+        Name = "Output",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+    local ConsoleSection = ConsoleTab:AddSection({
+        Name = "Console Output"
+    })
+
+    local OutputBox = ConsoleSection:AddTextbox({
+        Name = "Output",
+        Default = "",
+        TextDisappear = false,
+        Callback = function() end
+    })
+
+    -- Função para atualizar a área de texto
+    local function updateConsole(text)
+        OutputBox:Set(text)
+    end
+
     -- Valor
     _G.GetAnyMelee = true
     _G.DataPrinterEnabled = false
@@ -48,29 +81,31 @@ if game.PlaceId == 3237168 then
             local userData = game.Workspace.UserData:FindFirstChild("User_" .. player.UserId)
             if userData then
                 local Data = userData.Data
-                print("UserId:", player.UserId)
-                print("Name:", player.Name)
-                print("Beri:", Data.Cash.Value)
-                print("Bounty:", Data.Bounty.Value)
-                print("Compasses:", Data.CompassTokens.Value)
-                print("Gems:", Data.Gems.Value)
-                print("Kills:", Data.Kills.Value)
-                print("DF1:", Data.DevilFruit.Value)
-                print("DF2:", Data.DevilFruit2.Value)
-                print("StoredDF1:", Data.StoredDF1.Value)
-                print("StoredDF2:", Data.StoredDF2.Value)
-                print("StoredDF3:", Data.StoredDF3.Value)
-                print("StoredDF4:", Data.StoredDF4.Value)
-                print("StoredDF5:", Data.StoredDF5.Value)
-                print("StoredDF6:", Data.StoredDF6.Value)
-                print("StoredDF7:", Data.StoredDF7.Value)
-                print("StoredDF8:", Data.StoredDF8.Value)
-                print("StoredDF9:", Data.StoredDF9.Value)
-                print("StoredDF10:", Data.StoredDF10.Value)
-                print("StoredDF11:", Data.StoredDF11.Value)
-                print("StoredDF12:", Data.StoredDF12.Value)
+                local output = "UserId: " .. player.UserId .. "\n" ..
+                               "Name: " .. player.Name .. "\n" ..
+                               "Beri: " .. Data.Cash.Value .. "\n" ..
+                               "Bounty: " .. Data.Bounty.Value .. "\n" ..
+                               "Compasses: " .. Data.CompassTokens.Value .. "\n" ..
+                               "Gems: " .. Data.Gems.Value .. "\n" ..
+                               "Kills: " .. Data.Kills.Value .. "\n" ..
+                               "DF1: " .. Data.DevilFruit.Value .. "\n" ..
+                               "DF2: " .. Data.DevilFruit2.Value .. "\n" ..
+                               "StoredDF1: " .. Data.StoredDF1.Value .. "\n" ..
+                               "StoredDF2: " .. Data.StoredDF2.Value .. "\n" ..
+                               "StoredDF3: " .. Data.StoredDF3.Value .. "\n" ..
+                               "StoredDF4: " .. Data.StoredDF4.Value .. "\n" ..
+                               "StoredDF5: " .. Data.StoredDF5.Value .. "\n" ..
+                               "StoredDF6: " .. Data.StoredDF6.Value .. "\n" ..
+                               "StoredDF7: " .. Data.StoredDF7.Value .. "\n" ..
+                               "StoredDF8: " .. Data.StoredDF8.Value .. "\n" ..
+                               "StoredDF9: " .. Data.StoredDF9.Value .. "\n" ..
+                               "StoredDF10: " .. Data.StoredDF10.Value .. "\n" ..
+                               "StoredDF11: " .. Data.StoredDF11.Value .. "\n" ..
+                               "StoredDF12: " .. Data.StoredDF12.Value
+                updateConsole(output)
             else
                 warn("User data not found for player: " .. player.Name)
+                updateConsole("User data not found for player: " .. player.Name)
             end
             wait(5)  -- Intervalo de tempo entre impressões
         end
@@ -119,7 +154,10 @@ if game.PlaceId == 3237168 then
         Callback = function(Value)
             _G.DataPrinterEnabled = Value
             if _G.DataPrinterEnabled then
+                ConsoleWindow:Show()  -- Mostra a janela do console quando ativado
                 spawn(DataPrinter)
+            else
+                ConsoleWindow:Hide()  -- Esconde a janela do console quando desativado
             end
         end
     })
