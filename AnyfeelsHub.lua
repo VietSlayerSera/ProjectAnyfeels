@@ -170,12 +170,12 @@ if game.PlaceId == 3237168 then
     })
 
     -- Cria a seção dentro da aba de Autos para AutoHaki
-    local AutoHakiSection = AutosTab:AddSection({
-        Name = "AutoHaki"
+    local AutoAffySection = AutosTab:AddSection({
+        Name = "AutoAffy"
     })
 
     -- Adiciona um slider na seção AutoHaki
-    AutoHakiSection:AddSlider({
+    AutoAffySection:AddSlider({
         Name = "Slider",
         Min = 0,
         Max = 20,
