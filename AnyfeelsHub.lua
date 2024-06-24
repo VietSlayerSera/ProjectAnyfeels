@@ -42,7 +42,7 @@ if game.PlaceId == 3237168 then
     spawn(GetAnyMelee)
 
     -- Função para imprimir dados
-    function DataPrinter(outputBox)
+    function DataPrinter()
         while _G.DataPrinterEnabled do
             local player = game.Players.LocalPlayer
             local userData = game.Workspace.UserData:FindFirstChild("User_" .. player.UserId)
@@ -71,10 +71,11 @@ if game.PlaceId == 3237168 then
                     "StoredDF11: " .. Data.StoredDF11.Value,
                     "StoredDF12: " .. Data.StoredDF12.Value
                 }
-                outputBox:SetText(table.concat(output, "\n"))
+                -- Atualiza a janela de output
+                outputWindow:SetContent(table.concat(output, "\n"))
             else
                 warn("User data not found for player: " .. player.Name)
-                outputBox:SetText("User data not found for player: " .. player.Name)
+                outputWindow:SetContent("User data not found for player: " .. player.Name)
             end
             wait(5)  -- Intervalo de tempo entre impressões
         end
@@ -116,13 +117,15 @@ if game.PlaceId == 3237168 then
         Name = "Data Printer"
     })
 
-    -- Adiciona uma área de texto para o output
-    local outputBox = UteisSection:AddTextbox({
-        Name = "Output",
-        Text = "",
-        MultiLine = true,
-        ClearTextOnFocus = false,
-        TextEditable = false
+    -- Cria a janela de output
+    local outputWindow = OrionLib:MakeWindow({
+        Name = "Data Printer Output",
+        HidePremium = false,
+        SaveConfig = false,
+        ConfigFolder = "OutputWindow",
+        IntroEnabled = false,
+        IntroText = "Data Printer",
+        Icon = "rbxassetid://4483345998"
     })
 
     -- Adiciona um toggle na seção Uteis
@@ -132,9 +135,10 @@ if game.PlaceId == 3237168 then
         Callback = function(Value)
             _G.DataPrinterEnabled = Value
             if _G.DataPrinterEnabled then
-                spawn(function() DataPrinter(outputBox) end)
+                outputWindow:Show()  -- Mostra a janela de output quando ativado
+                spawn(DataPrinter)
             else
-                outputBox:SetText("")  -- Limpa a área de texto quando desativado
+                outputWindow:Hide()  -- Esconde a janela de output quando desativado
             end
         end
     })
