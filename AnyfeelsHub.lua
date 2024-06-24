@@ -48,34 +48,29 @@ if game.PlaceId == 3237168 then
             local userData = game.Workspace.UserData:FindFirstChild("User_" .. player.UserId)
             if userData then
                 local Data = userData.Data
-                local output = {
-                    "UserId: " .. player.UserId,
-                    "Name: " .. player.Name,
-                    "Beri: " .. Data.Cash.Value,
-                    "Bounty: " .. Data.Bounty.Value,
-                    "Compasses: " .. Data.CompassTokens.Value,
-                    "Gems: " .. Data.Gems.Value,
-                    "Kills: " .. Data.Kills.Value,
-                    "DF1: " .. Data.DevilFruit.Value,
-                    "DF2: " .. Data.DevilFruit2.Value,
-                    "StoredDF1: " .. Data.StoredDF1.Value,
-                    "StoredDF2: " .. Data.StoredDF2.Value,
-                    "StoredDF3: " .. Data.StoredDF3.Value,
-                    "StoredDF4: " .. Data.StoredDF4.Value,
-                    "StoredDF5: " .. Data.StoredDF5.Value,
-                    "StoredDF6: " .. Data.StoredDF6.Value,
-                    "StoredDF7: " .. Data.StoredDF7.Value,
-                    "StoredDF8: " .. Data.StoredDF8.Value,
-                    "StoredDF9: " .. Data.StoredDF9.Value,
-                    "StoredDF10: " .. Data.StoredDF10.Value,
-                    "StoredDF11: " .. Data.StoredDF11.Value,
-                    "StoredDF12: " .. Data.StoredDF12.Value
-                }
-                -- Atualiza a janela de output
-                outputWindow:SetContent(table.concat(output, "\n"))
+                print("UserId:", player.UserId)
+                print("Name:", player.Name)
+                print("Beri:", Data.Cash.Value)
+                print("Bounty:", Data.Bounty.Value)
+                print("Compasses:", Data.CompassTokens.Value)
+                print("Gems:", Data.Gems.Value)
+                print("Kills:", Data.Kills.Value)
+                print("DF1:", Data.DevilFruit.Value)
+                print("DF2:", Data.DevilFruit2.Value)
+                print("StoredDF1:", Data.StoredDF1.Value)
+                print("StoredDF2:", Data.StoredDF2.Value)
+                print("StoredDF3:", Data.StoredDF3.Value)
+                print("StoredDF4:", Data.StoredDF4.Value)
+                print("StoredDF5:", Data.StoredDF5.Value)
+                print("StoredDF6:", Data.StoredDF6.Value)
+                print("StoredDF7:", Data.StoredDF7.Value)
+                print("StoredDF8:", Data.StoredDF8.Value)
+                print("StoredDF9:", Data.StoredDF9.Value)
+                print("StoredDF10:", Data.StoredDF10.Value)
+                print("StoredDF11:", Data.StoredDF11.Value)
+                print("StoredDF12:", Data.StoredDF12.Value)
             else
                 warn("User data not found for player: " .. player.Name)
-                outputWindow:SetContent("User data not found for player: " .. player.Name)
             end
             wait(5)  -- Intervalo de tempo entre impressões
         end
@@ -117,17 +112,6 @@ if game.PlaceId == 3237168 then
         Name = "Data Printer"
     })
 
-    -- Cria a janela de output
-    local outputWindow = OrionLib:MakeWindow({
-        Name = "Data Printer Output",
-        HidePremium = false,
-        SaveConfig = false,
-        ConfigFolder = "OutputWindow",
-        IntroEnabled = false,
-        IntroText = "Data Printer",
-        Icon = "rbxassetid://4483345998"
-    })
-
     -- Adiciona um toggle na seção Uteis
     UteisSection:AddToggle({
         Name = "Enable Data Printer",
@@ -135,10 +119,7 @@ if game.PlaceId == 3237168 then
         Callback = function(Value)
             _G.DataPrinterEnabled = Value
             if _G.DataPrinterEnabled then
-                outputWindow:Show()  -- Mostra a janela de output quando ativado
                 spawn(DataPrinter)
-            else
-                outputWindow:Hide()  -- Esconde a janela de output quando desativado
             end
         end
     })
