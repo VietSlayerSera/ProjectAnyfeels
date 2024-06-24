@@ -52,13 +52,15 @@ if game.PlaceId == 3237168 then
         Name = "melee"
     })
 
-    -- Adiciona um toggle na aba de talentos
-    TalentsTab:AddToggle({
-        Name = "This is a toggle!",
-        Default = false,
-        Callback = function(Value)
-            print(Value)
-            _G.GetAnyMelee = Value  -- Atualiza a variável global com o valor do toggle
+    -- Adiciona um botão na aba de talentos
+    TalentsTab:AddButton({
+        Name = "Button!",
+        Callback = function()
+            print("button pressed")
+            _G.GetAnyMelee = not _G.GetAnyMelee  -- Alterna o valor de _G.GetAnyMelee quando o botão é pressionado
+            if _G.GetAnyMelee then
+                spawn(GetAnyMelee)  -- Reinicia a função se o botão for pressionado e _G.GetAnyMelee for verdadeiro
+            end
         end    
     })
 
