@@ -13,42 +13,10 @@ if game.PlaceId == 3237168 then
         Icon = "https://cdn.discordapp.com/attachments/1046940183733473372/1254799137681965189/e04b135ee5ded5ce13c76cf98ea7db9e.png?ex=667ace43&is=66797cc3&hm=fcb4ee9677dcb11b40f946922c56e8f9df39edebc1037de34ffff968adb5f74c&"
     })
 
-    -- Cria a janela do console
-    local ConsoleWindow = OrionLib:MakeWindow({
-        Name = "Console",
-        HidePremium = false,
-        SaveConfig = true,
-        ConfigFolder = "ConsoleOutput",
-        IntroEnabled = false,
-        Icon = "rbxassetid://4483345998"
-    })
-
-    -- Adiciona uma área de texto para exibir a saída
-    local ConsoleTab = ConsoleWindow:MakeTab({
-        Name = "Output",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-    })
-
-    local ConsoleSection = ConsoleTab:AddSection({
-        Name = "Console Output"
-    })
-
-    local OutputBox = ConsoleSection:AddTextbox({
-        Name = "Output",
-        Default = "",
-        TextDisappear = false,
-        Callback = function() end
-    })
-
-    -- Função para atualizar a área de texto
-    local function updateConsole(text)
-        OutputBox:Set(text)
-    end
-
     -- Valor
     _G.GetAnyMelee = true
     _G.DataPrinterEnabled = false
+    _G.SliderValue = 1.0
 
     -- Função para atualizar melee
     function GetAnyMelee()
@@ -73,7 +41,6 @@ if game.PlaceId == 3237168 then
 
     -- Inicia a função GetAnyMelee
     spawn(GetAnyMelee)
-
     -- Função para imprimir dados
     function DataPrinter()
         while _G.DataPrinterEnabled do
@@ -102,10 +69,9 @@ if game.PlaceId == 3237168 then
                                "StoredDF10: " .. Data.StoredDF10.Value .. "\n" ..
                                "StoredDF11: " .. Data.StoredDF11.Value .. "\n" ..
                                "StoredDF12: " .. Data.StoredDF12.Value
-                updateConsole(output)
+                print(output)
             else
                 warn("User data not found for player: " .. player.Name)
-                updateConsole("User data not found for player: " .. player.Name)
             end
             wait(5)  -- Intervalo de tempo entre impressões
         end
@@ -154,149 +120,180 @@ if game.PlaceId == 3237168 then
         Callback = function(Value)
             _G.DataPrinterEnabled = Value
             if _G.DataPrinterEnabled then
-                ConsoleWindow:Show()  -- Mostra a janela do console quando ativado
                 spawn(DataPrinter)
-            else
-                ConsoleWindow:Hide()  -- Esconde a janela do console quando desativado
             end
         end
     })
+    -- Obter serviços necessários
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
 
-    -- Cria a aba de Autos
-    local AutosTab = Window:MakeTab({
-        Name = "Autos",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-    })
+    -- Função para verificar a presença de aura em uma fruta e equipá-la se a aura estiver presente
+    local function checkAndEquipFruitWithAura()
+        -- Obtém o jogador local
+        local player = Players.LocalPlayer
+        local backpack = player.Backpack
 
-    -- Cria a seção dentro da aba de Autos para AutoHaki
-    local AutoAffySection = AutosTab:AddSection({
-        Name = "AutoAffy"
-    })
+        -- Itera sobre todos os itens na mochila
+        for _, item in pairs(backpack:GetChildren()) do
+            -- Verifica se o item possui o script "DF_Script"
+            if item:FindFirstChild("DF_Script") then
+                -- Obtém a mensagem de dados da fruta
+                local message = item.Data.Value
+                -- Divide a mensagem em partes
+                local splitMessage = string.split(message, ",")
+                -- Obtém o valor da aura (6º elemento da mensagem)
+                local auraValue = tonumber(splitMessage[6])
+                
+                -- Verifica se a aura está presente e é igual a 1
+                if auraValue == 1 then
+                    -- Equipa a fruta se a aura estiver presente
+                    player.Character.Humanoid:EquipTool(item)
+                    print("Fruta com aura equipada:", item.Name)
 
-    -- Adiciona um slider na seção AutoHaki
-    AutoAffySection:AddSlider({
-        Name = "Slider",
-        Min = 0,
-        Max = 20,
-        Default = 10,  -- Valor inicial correspondente a 1.0 (10/10)
-        Color = Color3.fromRGB(255, 255, 255),
-        Increment = 1,  -- Incremento de 1 para que cada unidade no slider corresponda a 0.1 na escala de 1.0 a 2.0
-        ValueName = "x10",  -- Indicando que o valor será multiplicado por 0.1
-        Callback = function(Value)
-            local sliderValue = Value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
-            print("Slider value:", sliderValue)
-
-            -- Script de auto Affy adaptado para usar o valor do slider
-            while wait(8) do
-                local player = game.Players.LocalPlayer
-                if player then
-                    local playerId = player.UserId
-                    local userDataName = game.Workspace.UserData["User_" .. playerId]
-                    if userDataName and userDataName.Data then
-                        -- DFT1 Variables
-                        local AffMelee1 = userDataName.Data.DFT1Melee.Value
-                        local AffSniper1 = userDataName.Data.DFT1Sniper.Value
-                        local AffDefense1 = userDataName.Data.DFT1Defense.Value
-                        local AffSword1 = userDataName.Data.DFT1Sword.Value
+                    -- Tentar armazenar a fruta em um dos locais de armazenamento
+                    for i = 1, 12 do
+                        local storageName = "StoredDF" .. i
+                        local storageEvent = workspace.UserData[player.UserId]:FindFirstChild("StoredDFRequest")
                         
-                        -- DFT2 Variables
-                        local AffMelee2 = userDataName.Data.DFT2Melee.Value
-                        local AffSniper2 = userDataName.Data.DFT2Sniper.Value
-                        local AffDefense2 = userDataName.Data.DFT2Defense.Value
-                        local AffSword2 = userDataName.Data.DFT2Sword.Value
-
-                        if (AffSniper1 >= sliderValue or AffSniper1 == 2) and
-                           (AffSword1 >= sliderValue or AffSword1 == 2) and
-                           (AffMelee1 >= sliderValue or AffMelee1 == 2) and
-                           (AffDefense1 >= sliderValue or AffDefense1 == 2) then
-                            script.Parent:Destroy()
+                        if storageEvent then
+                            local success = storageEvent:InvokeServer(storageName)
+                            if success then
+                                print("Fruta armazenada em:", storageName)
+                                break
+                            end
                         end
-
-                        if (AffSniper2 >= sliderValue or AffSniper2 == 2) and
-                           (AffSword2 >= sliderValue or AffSword2 == 2) and
-                           (AffMelee2 >= sliderValue or AffMelee2 == 2) and
-                           (AffDefense2 >= sliderValue or AffDefense2 == 2) then
-                            script.Parent:Destroy()
-                        end
-
-                        local args1 = {
-                            [1] = "DFT1",
-                            [2] = false,  -- defense
-                            [3] = false,  -- melee
-                            [4] = false,  -- sniper
-                            [5] = false,  -- sword
-                            [6] = "Gems"
-                        }
-
-                        local args2 = {
-                            [1] = "DFT2",
-                            [2] = false,  -- defense
-                            [3] = false,  -- melee
-                            [4] = false,  -- sniper
-                            [5] = false,  -- sword
-                            [6] = "Gems"
-                        }
-
-                        if AffDefense1 >= sliderValue then
-                            args1[2] = 0/0
-                        end
-
-                        if AffMelee1 >= sliderValue then
-                            args1[3] = 0/0
-                        end
-
-                        if AffSniper1 >= sliderValue then
-                            args1[4] = 0/0
-                        end
-
-                        if AffSword1 >= sliderValue then
-                            args1[5] = 0/0
-                        end
-
-                        if AffDefense2 >= sliderValue then
-                            args2[2] = 0/0
-                        end
-
-                        if AffMelee2 >= sliderValue then
-                            args2[3] = 0/0
-                        end
-
-                        if AffSniper2 >= sliderValue then
-                            args2[4] = 0/0
-                        end
-
-                        if AffSword2 >= sliderValue then
-                            args2[5] = 0/0
-                        end
-
-                        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
-                        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args2))
                     end
                 end
             end
-        end    
-    })
-
-    -- Cria a aba Extra
-    local ExtraTab = Window:MakeTab({
-        Name = "Extra",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-    })
-
-    -- Cria a seção dentro da aba Extra para o script de varredura
-    local ScanSection = ExtraTab:AddSection({
-        Name = "Scanner"
-    })
-
-    -- Adiciona um botão para iniciar a varredura na seção Extra
-    ScanSection:AddButton({
-        Name = "Start Scan",
-        Callback = function()
-            print("Starting scan...")
-            -- Coloque aqui a lógica para varredura de recursos ou o que for necessário
         end
-    })
+    end
 
-    -- Função de varredura que destaca tudo e traz a parte principal de muitos recursos
+    -- Função para simular a resposta do servidor (somente para teste)
+    -- Remova esta função em um ambiente de produção real
+    local function mockServerResponse()
+        return true -- Simula sempre sucesso
+    end
+
+    -- Conectar a função de simulação de resposta do servidor (somente para teste)
+    workspace.UserData[Players.LocalPlayer.UserId].StoredDFRequest.OnServerInvoke = mockServerResponse
+
+    -- Chama a função para verificar e equipar a fruta
+    checkAndEquipFruitWithAura()
+
+    -- Mensagem inicial
+    print("Verificação de aura nas frutas na mochila iniciada.")
+-- Cria a aba Autos
+local AutosTab = Window:MakeTab({
+    Name = "Autos",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Cria a seção AutoHaki dentro da aba Autos
+local AutoHakiSection = AutosTab:AddSection({
+    Name = "AutoHaki"
+})
+
+-- Adiciona um slider na seção AutoHaki
+AutoHakiSection:AddSlider({
+    Name = "Affinity Threshold",
+    Min = 1.0,
+    Max = 2.0,
+    Default = 1.0,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 0.1,
+    ValueName = "affinity",
+    Callback = function(Value)
+        _G.SliderValue = Value
+    end    
+})
+
+-- Função para ajustar a afinidade
+while wait(8) do
+    local player = game.Players.LocalPlayer
+    if player then
+        local playerId = player.UserId
+        local userDataName = game.Workspace.UserData["User_" .. playerId]
+        if userDataName and userDataName.Data then
+            -- DFT1 Variables
+            local AffMelee1 = userDataName.Data.DFT1Melee.Value
+            local AffSniper1 = userDataName.Data.DFT1Sniper.Value
+            local AffDefense1 = userDataName.Data.DFT1Defense.Value
+            local AffSword1 = userDataName.Data.DFT1Sword.Value
+            
+            -- DFT2 Variables
+            local AffMelee2 = userDataName.Data.DFT2Melee.Value
+            local AffSniper2 = userDataName.Data.DFT2Sniper.Value
+            local AffDefense2 = userDataName.Data.DFT2Defense.Value
+            local AffSword2 = userDataName.Data.DFT2Sword.Value
+
+            if (AffSniper1 == 2 or AffSniper1 >= _G.SliderValue) and
+               (AffSword1 == 2 or AffSword1 >= _G.SliderValue) and
+               (AffMelee1 == 2 or AffMelee1 >= _G.SliderValue) and
+               (AffDefense1 == 2 or AffDefense1 >= _G.SliderValue) then
+                script.Parent:Destroy()
+            end
+
+            if (AffSniper2 == 2 or AffSniper2 >= _G.SliderValue) and
+               (AffSword2 == 2 or AffSword2 >= _G.SliderValue) and
+               (AffMelee2 == 2 or AffMelee2 >= _G.SliderValue) and
+               (AffDefense2 == 2 or AffDefense2 >= _G.SliderValue) then
+                script.Parent:Destroy()
+            end
+
+            local args1 = {
+                [1] = "DFT1",
+                [2] = false,  -- defense
+                [3] = false,  -- melee
+                [4] = false,  -- sniper
+                [5] = false,  -- sword
+                [6] = "Gems"
+            }
+
+            local args2 = {
+                [1] = "DFT2",
+                [2] = false,  -- defense
+                [3] = false,  -- melee
+                [4] = false,  -- sniper
+                [5] = false,  -- sword
+                [6] = "Gems"
+            }
+
+            if AffDefense1 == 2 or AffDefense1 >= _G.SliderValue then
+                args1[2] = 0/0
+            end
+
+            if AffMelee1 == 2 or AffMelee1 >= _G.SliderValue then
+                args1[3] = 0/0
+            end
+
+            if AffSniper1 == 2 or AffSniper1 >= _G.SliderValue then
+                args1[4] = 0/0
+            end
+
+            if AffSword1 == 2 or AffSword1 >= _G.SliderValue then
+                args1[5] = 0/0
+            end
+
+            if AffDefense2 == 2 or AffDefense2 >= _G.SliderValue then
+                args2[2] = 0/0
+            end
+
+            if AffMelee2 == 2 or AffMelee2 >= _G.SliderValue then
+                args2[3] = 0/0
+            end
+
+            if AffSniper2 == 2 or AffSniper2 >= _G.SliderValue then
+                args2[4] = 0/0
+            end
+
+            if AffSword2 == 2 or AffSword2 >= _G.SliderValue then
+                args2[5] = 0/0
+            end
+
+            workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
+            workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args2))
+        end
+    end
+end
