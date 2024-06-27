@@ -87,9 +87,6 @@ if game.PlaceId == 3237168 then
         end    
     })
 
-    -- Inicializa o OrionLib
-    OrionLib:Init()
-end
 -- Função para atualizar melee
 function GetAnyMelee()
     while _G.GetAnyMelee do
@@ -245,3 +242,6 @@ spawn(function()
         wait(8)  -- Intervalo de verificação
     end
 end)
+    -- Inicializa o OrionLib
+    OrionLib:Init()
+end
